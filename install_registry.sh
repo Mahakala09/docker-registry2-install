@@ -32,6 +32,8 @@ docker run -d --name registry \
   -p 5000:5000 \
   -v "$REG_HOME/data":/var/lib/registry \
   -v "$CONFIG_YML":/etc/docker/registry/config.yml \
+  --log-opt max-size=10m \
+  --log-opt max-file=7 \
   registry:2
 
 echo "🧹 创建多仓库清理脚本..."
@@ -111,6 +113,8 @@ crontab -l | grep -v "$CRON_MARKER" > /tmp/cron_tmp || true
 echo "0 3 * * * $CLEAN_SCRIPT && docker stop registry && \
 docker run --rm -v $REG_HOME/data:/var/lib/registry \
 -v $CONFIG_YML:/etc/docker/registry/config.yml \
+--log-opt max-size=10m \
+--log-opt max-file=7 \
 registry:2 garbage-collect /etc/docker/registry/config.yml && docker start registry $CRON_MARKER" >> /tmp/cron_tmp
 
 # 应用 crontab
